@@ -102,3 +102,33 @@ func GetAllTransactions() (Transactions, error) {
 	}
 	return nil, fmt.Errorf("There are no transactions")
 }
+
+func GetTransactionsByDate(startDate time.Time, endDate time.Time) (Transactions, error) {
+	var resultTransactions Transactions
+
+	for _, val := range TotalTransactions {
+		fmt.Println(startDate, endDate, val.TxnDate)
+		if (val.TxnDate.After(startDate) && val.TxnDate.Before(endDate)) || val.TxnDate == startDate || val.TxnDate == endDate {
+			fmt.Println(val.TxnDate)
+			resultTransactions = append(resultTransactions, val)
+		}
+	}
+	if len(resultTransactions) == 0 {
+		return nil, fmt.Errorf("There are no transactions within given dates")
+	}
+	return resultTransactions, nil
+}
+
+func GetBalanceByDate(requiredDate time.Time) (*float64, error) {
+	var resultBalance float64 = -1.0 //assuming balance cannot go negative
+	for _, val := range TotalTransactions {
+		resultBalance = val.TxnBalance
+		if val.TxnDate.After(requiredDate) {
+			break
+		}
+	}
+	if resultBalance == -1.0 {
+		return nil, fmt.Errorf("Date out of range of data")
+	}
+	return &resultBalance, nil
+}
